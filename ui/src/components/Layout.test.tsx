@@ -145,6 +145,10 @@ vi.mock("./ToastViewport", () => ({
   ToastViewport: () => null,
 }));
 
+vi.mock("./ToastSoundBridge", () => ({
+  ToastSoundBridge: () => null,
+}));
+
 vi.mock("./MobileBottomNav", () => ({
   MobileBottomNav: () => null,
 }));

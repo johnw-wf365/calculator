@@ -30,6 +30,7 @@ export type HealthStatus = {
   deploymentExposure?: "private" | "public";
   localAiLoginSupported?: boolean;
   authReady?: boolean;
+  authDisableSignUp?: boolean;
   bootstrapStatus?: "ready" | "bootstrap_pending";
   bootstrapInviteActive?: boolean;
   features?: {

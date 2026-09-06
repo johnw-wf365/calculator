@@ -1,0 +1,16 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+!variables.tf
+!outputs.tf
+.environments/**/.terraform/
+.environments/**/.terraform.lock.hcl</｜DSML｜parameter>
+
+# IDE
+.idea/
+.vscode/
+*.swp

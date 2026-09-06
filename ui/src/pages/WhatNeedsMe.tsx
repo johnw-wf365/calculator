@@ -10,6 +10,7 @@ import { decisionsApi } from "../api/decisions";
 import { useCompany } from "../context/CompanyContext";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
 import { useToastActions } from "../context/ToastContext";
+import { useAttentionSound } from "../hooks/useAttentionSound";
 import { useInboxDismissals } from "../hooks/useInboxBadge";
 import { queryKeys } from "../lib/queryKeys";
 import {
@@ -125,6 +126,7 @@ export function WhatNeedsMe() {
   const { dismiss, snooze, restore } = useInboxDismissals(selectedCompanyId);
   const { pushToast } = useToastActions();
   const navigate = useNavigate();
+  useAttentionSound();
 
   // Date chips resolve to server-side activity bounds. Anchored to start-of-day,
   // so the resolved ISO strings are stable across renders within the same day —

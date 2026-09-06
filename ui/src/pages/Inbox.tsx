@@ -84,6 +84,7 @@ import {
   issueTrailingColumns,
 } from "../components/IssueColumns";
 import { IssueFiltersPopover } from "../components/IssueFiltersPopover";
+import { AttentionSoundPopover } from "../components/AttentionSoundPopover";
 import { InboxArchiveButton, IssueRow } from "../components/IssueRow";
 import { BlockedInboxView } from "../components/BlockedInboxView";
 import { SwipeToArchive } from "../components/SwipeToArchive";
@@ -174,6 +175,7 @@ import {
 } from "../lib/inbox";
 import { useDismissedInboxAlerts, useInboxDismissals, useReadInboxItems } from "../hooks/useInboxBadge";
 import { useInboxSortAttention } from "../hooks/useInboxSortAttention";
+import { useAttentionSound } from "../hooks/useAttentionSound";
 import {
   captureInboxOrderPin,
   reconcileInboxOrderPin,
@@ -807,6 +809,7 @@ function StreamlinedInbox() {
   const queryClient = useQueryClient();
   const [actionError, setActionError] = useState<string | null>(null);
   const { keyboardShortcutsEnabled } = useGeneralSettings();
+  useAttentionSound();
   const { data: experimentalSettings } = useQuery({
     queryKey: queryKeys.instance.experimentalSettings,
     queryFn: () => instanceSettingsApi.getExperimental(),
@@ -2448,6 +2451,7 @@ function StreamlinedInbox() {
           <>
           {tab === "blocked" ? (
             <>
+              <AttentionSoundPopover />
               <IssueFiltersPopover
                 state={issueFilters}
                 onChange={updateIssueFilters}
@@ -2544,6 +2548,7 @@ function StreamlinedInbox() {
             </>
           ) : showGeneralIssueToolbarControls ? (
             <>
+              <AttentionSoundPopover />
               <Button
                 type="button"
                 variant="outline"

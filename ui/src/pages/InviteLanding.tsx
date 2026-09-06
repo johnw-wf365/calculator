@@ -308,7 +308,15 @@ export function InviteLandingPage() {
     healthQuery.data?.deploymentMode === "authenticated" &&
     !sessionQuery.data &&
     invite?.allowedJoinTypes !== "agent";
+  const authDisableSignUp = healthQuery.data?.authDisableSignUp === true;
   const showsAgentForm = invite?.inviteType !== "bootstrap_ceo" && invite?.allowedJoinTypes === "agent";
+
+  // When sign-up is disabled, force sign-in mode on the invite landing page
+  useEffect(() => {
+    if (authDisableSignUp && authMode === "sign_up") {
+      setAuthMode("sign_in");
+    }
+  }, [authDisableSignUp, authMode]);
   const shouldAutoAcceptHumanInvite =
     Boolean(sessionQuery.data) &&
     !showsAgentForm &&
@@ -667,15 +675,18 @@ export function InviteLandingPage() {
               <div className="space-y-5">
                 <div>
                   <h2 className="text-lg font-semibold">
-                    {authMode === "sign_up" ? "Create your account" : "Sign in to continue"}
+                    {authDisableSignUp ? "Sign in to continue" : (authMode === "sign_up" ? "Create your account" : "Sign in to continue")}
                   </h2>
                   <p className="mt-1 text-sm text-zinc-400">
-                    {authMode === "sign_up"
-                      ? `Start with a Paperclip account. After that, you'll come right back here to accept the invite for ${companyDisplayName}.`
-                      : "Use the Paperclip account that already matches this invite. If you do not have one yet, switch back to create account."}
+                    {authDisableSignUp
+                      ? "Public sign-up is disabled. Use the Paperclip account that already matches this invite."
+                      : authMode === "sign_up"
+                        ? `Start with a Paperclip account. After that, you'll come right back here to accept the invite for ${companyDisplayName}.`
+                        : "Use the Paperclip account that already matches this invite. If you do not have one yet, switch back to create account."}
                   </p>
                 </div>
 
+                {!authDisableSignUp && (
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -706,6 +717,7 @@ export function InviteLandingPage() {
                     I already have an account
                   </button>
                 </div>
+                )}
 
                 <form
                   className="space-y-4"

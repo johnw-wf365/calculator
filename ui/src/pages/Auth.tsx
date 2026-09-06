@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "@/lib/router";
 import { authApi } from "../api/auth";
+import { healthApi } from "../api/health";
 import { queryKeys } from "../lib/queryKeys";
 import { getRememberedInvitePath } from "../lib/invite-memory";
 import { Button } from "@/components/ui/button";
@@ -32,12 +33,25 @@ export function AuthPage() {
     queryFn: () => authApi.getSession(),
     retry: false,
   });
+  const { data: health } = useQuery({
+    queryKey: queryKeys.health,
+    queryFn: () => healthApi.get(),
+    retry: false,
+  });
+  const authDisableSignUp = health?.authDisableSignUp === true;
 
   useEffect(() => {
     if (session) {
       navigate(nextPath, { replace: true });
     }
   }, [session, navigate, nextPath]);
+
+  // When sign-up is disabled, force sign-in mode and ignore sign-up attempts
+  useEffect(() => {
+    if (authDisableSignUp && mode === "sign_up") {
+      setMode("sign_in");
+    }
+  }, [authDisableSignUp, mode]);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -186,17 +200,37 @@ export function AuthPage() {
           </form>
 
           <div className="mt-5 text-sm text-muted-foreground">
-            {mode === "sign_in" ? "Need an account?" : "Already have an account?"}{" "}
-            <button
-              type="button"
-              className="font-medium text-foreground underline underline-offset-2"
-              onClick={() => {
-                setError(null);
-                setMode(mode === "sign_in" ? "sign_up" : "sign_in");
-              }}
-            >
-              {mode === "sign_in" ? "Create one" : "Sign in"}
-            </button>
+            {authDisableSignUp ? (
+              "Public sign-up is disabled. Use an invite link to create an account."
+            ) : mode === "sign_in" ? (
+              <>
+                Need an account?{" "}
+                <button
+                  type="button"
+                  className="font-medium text-foreground underline underline-offset-2"
+                  onClick={() => {
+                    setError(null);
+                    setMode("sign_up");
+                  }}
+                >
+                  Create one
+                </button>
+              </>
+            ) : (
+              <>
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  className="font-medium text-foreground underline underline-offset-2"
+                  onClick={() => {
+                    setError(null);
+                    setMode("sign_in");
+                  }}
+                >
+                  Sign in
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

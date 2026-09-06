@@ -12,6 +12,7 @@ import {
   type AttentionGroupBy,
   type AttentionSortOrder,
 } from "../lib/attention";
+import { AttentionSoundPopover } from "./AttentionSoundPopover";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
@@ -60,6 +61,8 @@ export function DecisionsToolbar({
           {visibleCount} {visibleCount === 1 ? "decision" : "decisions"}
         </span>
       )}
+      {/* Sound */}
+      <AttentionSoundPopover />
       {/* Filter */}
       <Popover>
         <PopoverTrigger asChild>

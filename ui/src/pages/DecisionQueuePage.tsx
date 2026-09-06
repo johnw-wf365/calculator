@@ -10,6 +10,7 @@ import { decisionQueuesApi } from "../api/decisionQueues";
 import { useCompany } from "../context/CompanyContext";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
 import { useToastActions } from "../context/ToastContext";
+import { useAttentionSound } from "../hooks/useAttentionSound";
 import { useInboxDismissals } from "../hooks/useInboxBadge";
 import { queryKeys } from "../lib/queryKeys";
 import {
@@ -62,6 +63,7 @@ export function DecisionQueuePage() {
   const { selectedCompanyId } = useCompany();
   const { setBreadcrumbs } = useBreadcrumbs();
   const { pushToast } = useToastActions();
+  useAttentionSound();
   const queryClient = useQueryClient();
   const params = useParams<{ key: string }>();
   const queueKey = params.key ?? "";
