@@ -82,7 +82,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Push schema
-        run: pnpm exec drizzle-kit push:pg
+        run: pnpm exec drizzle-kit push
         env:
           DATABASE_URL: postgresql://calculator:calculator_test@localhost:5432/calculator_test
 

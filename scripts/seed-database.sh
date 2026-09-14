@@ -77,9 +77,9 @@ echo "Seeding $ENVIRONMENT database..."
 echo "Pushing schema..."
 cd "${SCRIPT_DIR}/.."
 if command -v pnpm &> /dev/null; then
-    pnpm exec drizzle-kit push:pg
+    pnpm exec drizzle-kit push
 else
-    npx drizzle-kit push:pg
+    npx drizzle-kit push
 fi
 
 # Run seed data

@@ -25,9 +25,9 @@ echo "Running migrations for $ENVIRONMENT..."
 
 # Use drizzle-kit push for simple migration (auto-applies schema)
 if command -v pnpm &> /dev/null; then
-    pnpm exec drizzle-kit push:pg
+    pnpm exec drizzle-kit push
 elif command -v npx &> /dev/null; then
-    npx drizzle-kit push:pg
+    npx drizzle-kit push
 else
     echo "Error: Neither pnpm nor npx found. Cannot run migrations."
     exit 1
