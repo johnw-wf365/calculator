@@ -12,6 +12,8 @@ import { IncomeTaxCalculator } from "@/components/calculators/IncomeTaxCalculato
 import { MortgageCalculator } from "@/components/calculators/MortgageCalculator";
 import { RetirementCalculator } from "@/components/calculators/RetirementCalculator";
 import { FreemiumGate } from "@/components/FreemiumGate";
+import AdUnit from "@/components/AdUnit";
+import { adSlots } from "@/config/adsense";
 
 const calculatorComponents: Record<string, React.ComponentType> = {
   "tip-calculator": TipCalculator,
@@ -49,18 +51,14 @@ export default async function CalculatorPage({
       <p className="text-gray-600 mb-6">{meta.description}</p>
 
       {/* AdSense top banner */}
-      <div className="my-4 p-3 bg-gray-100 rounded text-center text-gray-400 text-sm">
-        Ad Space
-      </div>
+      <AdUnit config={adSlots.calculatorTop} className="my-4" minHeight={120} />
 
       <FreemiumGate calculatorSlug={calculator}>
         <CalculatorComponent />
       </FreemiumGate>
 
       {/* AdSense bottom banner */}
-      <div className="my-8 p-3 bg-gray-100 rounded text-center text-gray-400 text-sm">
-        Ad Space
-      </div>
+      <AdUnit config={adSlots.calculatorBottom} className="my-8" minHeight={120} />
     </div>
   );
 }

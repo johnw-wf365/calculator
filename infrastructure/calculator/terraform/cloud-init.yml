@@ -1,0 +1,72 @@
+# Cloud-Init template for server setup
+# Runs on first boot via UpCloud user_data
+
+#cloud-config
+hostname: ${hostname}
+fqdn: ${hostname}.${environment}.local
+manage_etc_hosts: true
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - git
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+  - jq
+
+users:
+  - name: deploy
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+runcmd:
+  # UFW — only SSH/HTTP/HTTPS
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw --force enable
+
+  # Fail2ban — protect SSH
+  - systemctl enable fail2ban
+  - systemctl start fail2ban
+
+  # Automated security updates
+  - dpkg-reconfigure -plow unattended-upgrades
+
+  # Node.js 20.x
+  - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  - apt-get install -y nodejs
+
+  # pnpm
+  - npm install -g pnpm
+
+  # PM2
+  - npm install -g pm2
+
+  # Setup app directory
+  - mkdir -p /opt/calculator
+  - chown deploy:deploy /opt/calculator
+
+  # Setup log directory
+  - mkdir -p /var/log/calculator
+  - chown deploy:deploy /var/log/calculator
+
+  # Setup PostgreSQL via Docker (optional, or apt install)
+  # - apt-get install -y postgresql postgresql-contrib
+  # OR
+  # - curl -fsSL https://get.docker.com | sh
+  # - docker run -d --name postgres -e POSTGRES_PASSWORD=... -v /var/lib/postgresql/data:/var/lib/postgresql/data -p 5432:5432 postgres:16-alpine
+
+  # Install Netdata (optional — monitoring)
+  # - curl https://my-netdata.io/kickstart.sh > /tmp/netdata-kickstart.sh
+  # - sh /tmp/netdata-kickstart.sh --non-interactive
+
+final_message: "Calculator server setup complete."

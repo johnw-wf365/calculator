@@ -142,3 +142,27 @@ describe("Income Tax Calculator", () => {
     expect(result.effectiveRate).toBeGreaterThan(0);
   });
 });
+
+describe("AdSense Configuration", () => {
+  it("adsense config has correct structure", async () => {
+    const config = await import("../src/config/adsense");
+    expect(config).toHaveProperty("adsensePublisherId");
+    expect(config).toHaveProperty("adsenseEnabled");
+    expect(config).toHaveProperty("adSlots");
+    expect(config.adSlots).toHaveProperty("calculatorTop");
+    expect(config.adSlots).toHaveProperty("calculatorBottom");
+    expect(config.adSlots).toHaveProperty("homeSidebar");
+  });
+
+  it("ad slot configs have required fields", async () => {
+    const { adSlots } = await import("../src/config/adsense");
+    for (const [key, slot] of Object.entries(adSlots)) {
+      expect(slot).toHaveProperty("slot");
+      expect(slot).toHaveProperty("format");
+      expect(slot).toHaveProperty("fullWidthResponsive");
+      expect(typeof slot.slot).toBe("string");
+      expect(typeof slot.format).toBe("string");
+      expect(typeof slot.fullWidthResponsive).toBe("boolean");
+    }
+  });
+});

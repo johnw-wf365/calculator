@@ -1,9 +1,10 @@
-// Freemium gate logic — cookie-based usage tracking
+// Freemium gate logic — cookie-based usage tracking + session user support
 // - Unregistered: 3 calculations per day
 // - Registered: 10 calculations per month
 // - Premium: unlimited
 
 import { cookies } from "next/headers";
+import { auth } from "@/auth";
 
 export interface UsageInfo {
   count: number;
@@ -22,9 +23,44 @@ export async function getUsage(): Promise<UsageInfo> {
   const usageCookie = cookieStore.get("calcsuite_usage");
   const authCookie = cookieStore.get("calcsuite_auth");
 
-  const isRegistered = authCookie?.value === "registered";
-  const isPremium = authCookie?.value === "premium";
+  // Check if user is authenticated via NextAuth
+  const session = await auth();
+  const isRegistered = !!session?.user;
+  const isPremium = (session?.user as { subscriptionStatus?: string })?.subscriptionStatus === "premium";
 
+  // For unregistered users, use cookie-based tracking
+  if (!isRegistered) {
+    const now = new Date();
+    let count = 0;
+    let resetDate = new Date(now);
+
+    if (usageCookie) {
+      try {
+        const data = JSON.parse(usageCookie.value);
+        const savedDate = new Date(data.date);
+        const isSameDay =
+          savedDate.getDate() === now.getDate() &&
+          savedDate.getMonth() === now.getMonth() &&
+          savedDate.getFullYear() === now.getFullYear();
+
+        if (isSameDay) {
+          count = data.count;
+        }
+
+        resetDate.setDate(resetDate.getDate() + 1);
+        resetDate.setHours(0, 0, 0, 0);
+      } catch {
+        // Invalid cookie, reset
+      }
+    }
+
+    const limit = DAILY_LIMIT;
+    const remaining = Math.max(0, limit - count);
+
+    return { count, limit, isPremium: false, isRegistered: false, remaining, resetDate };
+  }
+
+  // For registered users, use monthly limit
   const now = new Date();
   let count = 0;
   let resetDate = new Date(now);
@@ -33,43 +69,34 @@ export async function getUsage(): Promise<UsageInfo> {
     try {
       const data = JSON.parse(usageCookie.value);
       const savedDate = new Date(data.date);
-      const isSameDay =
-        savedDate.getDate() === now.getDate() &&
-        savedDate.getMonth() === now.getMonth() &&
-        savedDate.getFullYear() === now.getFullYear();
       const isSameMonth =
         savedDate.getMonth() === now.getMonth() &&
         savedDate.getFullYear() === now.getFullYear();
 
-      if (isPremium || isRegistered ? isSameMonth : isSameDay) {
+      if (isSameMonth) {
         count = data.count;
       }
 
-      if (isPremium || isRegistered) {
-        resetDate.setMonth(resetDate.getMonth() + 1);
-        resetDate.setDate(1);
-      } else {
-        resetDate.setDate(resetDate.getDate() + 1);
-        resetDate.setHours(0, 0, 0, 0);
-      }
+      resetDate.setMonth(resetDate.getMonth() + 1);
+      resetDate.setDate(1);
     } catch {
       // Invalid cookie, reset
     }
   }
 
-  const limit = isPremium ? Infinity : isRegistered ? MONTHLY_LIMIT : DAILY_LIMIT;
+  const limit = isPremium ? Infinity : MONTHLY_LIMIT;
   const remaining = Math.max(0, limit - count);
 
-  return { count, limit, isPremium, isRegistered, remaining, resetDate };
+  return { count, limit, isPremium, isRegistered: true, remaining, resetDate };
 }
 
 export async function incrementUsage(): Promise<UsageInfo> {
   const cookieStore = await cookies();
   const usageCookie = cookieStore.get("calcsuite_usage");
-  const authCookie = cookieStore.get("calcsuite_auth");
 
-  const isRegistered = authCookie?.value === "registered";
-  const isPremium = authCookie?.value === "premium";
+  const session = await auth();
+  const isRegistered = !!session?.user;
+  const isPremium = (session?.user as { subscriptionStatus?: string })?.subscriptionStatus === "premium";
 
   const current = await getUsage();
   const newCount = current.count + 1;

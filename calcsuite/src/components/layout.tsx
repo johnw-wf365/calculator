@@ -4,6 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { calculators } from "@/config/calculators";
+import { AuthButton } from "@/components/AuthButton";
 
 export function Header() {
   return (
@@ -12,10 +13,11 @@ export function Header() {
         <Link href="/" className="text-xl font-bold text-blue-600">
           CalcSuite
         </Link>
-        <nav className="flex gap-4 text-sm">
+        <nav className="flex items-center gap-4 text-sm">
           <Link href="/calculators" className="hover:underline">
             All Calculators
           </Link>
+          <AuthButton />
         </nav>
       </div>
     </header>

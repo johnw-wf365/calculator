@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { calculators } from "@/config/calculators";
+import AdUnit from "@/components/AdUnit";
+import { adSlots } from "@/config/adsense";
 
 export default function HomePage() {
   const featured = calculators.slice(0, 6);
@@ -40,11 +42,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AdSense placeholder */}
-      <div className="my-8 p-4 bg-gray-100 rounded text-center text-gray-400 text-sm">
-        {/* Google AdSense will be integrated here */}
-        Ad Space
-      </div>
+      {/* AdSense home page banner */}
+      <AdUnit config={adSlots.homeSidebar} className="my-8" minHeight={250} />
 
       <section className="py-12">
         <h2 className="text-2xl font-bold mb-6">All Calculators</h2>
