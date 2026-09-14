@@ -52,21 +52,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: calculator
-          POSTGRES_PASSWORD: calculator_test
-          POSTGRES_DB: calculator_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -81,15 +66,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Push schema
-        run: pnpm exec drizzle-kit push
-        env:
-          DATABASE_URL: postgresql://calculator:calculator_test@localhost:5432/calculator_test
-
       - name: Run tests
         run: pnpm test
         env:
-          DATABASE_URL: postgresql://calculator:calculator_test@localhost:5432/calculator_test
           NODE_ENV: test
 
   build:
