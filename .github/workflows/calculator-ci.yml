@@ -81,8 +81,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Run migrations
-        run: pnpm db:migrate
+      - name: Push schema
+        run: pnpm exec drizzle-kit push --force
         env:
           DATABASE_URL: postgresql://calculator:calculator_test@localhost:5432/calculator_test
 

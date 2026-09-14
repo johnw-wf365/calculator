@@ -72,15 +72,14 @@ case "$ENVIRONMENT" in
 esac
 
 echo "Seeding $ENVIRONMENT database..."
-echo "DB URL: ${DB_URL//password/password@}"
 
-# Run migrations first
-echo "Running migrations..."
+# Push schema first
+echo "Pushing schema..."
 cd "${SCRIPT_DIR}/.."
 if command -v pnpm &> /dev/null; then
-    pnpm db:migrate
+    pnpm exec drizzle-kit push
 else
-    echo "pnpm not found, skipping migrations"
+    npx drizzle-kit push
 fi
 
 # Run seed data
