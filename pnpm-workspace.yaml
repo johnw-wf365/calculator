@@ -12,6 +12,7 @@ packages:
   - server
   - ui
   - cli
+  - calcsuite
 
 # Keep in sync with package.json#pnpm.patchedDependencies. Newer pnpm
 # versions read patch configuration only from the workspace manifest.
