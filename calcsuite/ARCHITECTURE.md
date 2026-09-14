@@ -64,7 +64,7 @@ All calculations are pure functions in `src/lib/calculators.ts` — no side effe
 - ✅ Freemium gate (cookie-based)
 - ✅ AdSense placeholder slots
 - ✅ Production build passing (40 static pages)
-- ⬜ User registration (NextAuth)
-- ⬜ Stripe integration
+- ✅ Stripe integration (checkout, webhook, portal)
+- ✅ User registration (NextAuth) — in progress
 - ⬜ Google AdSense actual integration (needs account)
 - ⬜ Blink.new MCP evaluation

@@ -1,7 +1,9 @@
-// Freemium gate — client component that tracks usage
+// Freemium gate — client component that tracks usage and prompts registration
 "use client";
 
 import { useState, useEffect, ReactNode } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface UsageState {
   count: number;
@@ -19,6 +21,7 @@ export function FreemiumGate({
   children: ReactNode;
 }) {
   const [usage, setUsage] = useState<UsageState | null>(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
     async function loadUsage() {
@@ -41,7 +44,7 @@ export function FreemiumGate({
       <div className="card text-center">
         <h2 className="text-xl font-semibold mb-2">Daily limit reached</h2>
         <p className="text-gray-600 mb-4">
-          You've used {usage.count} of {usage.limit} free calculations today.
+          You&apos;ve used {usage.count} of {usage.limit} free calculations today.
         </p>
         <div className="flex flex-col gap-3 items-center">
           <div className="p-4 bg-blue-50 rounded w-full">
@@ -49,22 +52,48 @@ export function FreemiumGate({
             <p className="text-sm text-gray-600">
               Free email registration, no credit card needed.
             </p>
-            <button className="btn btn-primary mt-2">Register Free</button>
+            <Link href="/auth/signup" className="btn btn-primary mt-2 inline-block">
+              Register Free
+            </Link>
           </div>
           <div className="p-4 bg-amber-50 rounded w-full">
             <h3 className="font-semibold">Go Premium — £4.99/mo</h3>
             <p className="text-sm text-gray-600">
               Unlimited calculations, ad-free, premium features.
             </p>
-            <button className="btn btn-primary mt-2 bg-amber-500 hover:bg-amber-600">
+            <Link href="/auth/signin" className="btn btn-primary mt-2 bg-amber-500 hover:bg-amber-600 inline-block">
               Subscribe
-            </button>
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
+  // If user is logged in, show their status
+  if (session?.user) {
+    return (
+      <>
+        <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
+          <span>
+            {usage.isPremium
+              ? "Unlimited (Premium)"
+              : usage.isRegistered
+                ? `${usage.remaining} calculations left this month`
+                : `${usage.remaining} free today`}
+          </span>
+          {!usage.isPremium && (
+            <span className="text-blue-600">
+              Upgrade for more →
+            </span>
+          )}
+        </div>
+        {children}
+      </>
+    );
+  }
+
+  // Unregistered user
   return (
     <>
       <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
@@ -76,9 +105,9 @@ export function FreemiumGate({
               : `${usage.remaining} free today`}
         </span>
         {!usage.isPremium && (
-          <span className="text-blue-600">
+          <Link href="/auth/signup" className="text-blue-600 hover:underline">
             Register for more →
-          </span>
+          </Link>
         )}
       </div>
       {children}

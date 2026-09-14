@@ -36,6 +36,11 @@ export function middleware(request: NextRequest) {
   }
 
   const url = request.nextUrl.clone();
+  // Don't rewrite API routes — they handle their own logic
+  if (url.pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
   url.pathname = `/${locale}${url.pathname}`;
 
   return NextResponse.rewrite(url);
@@ -49,7 +54,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
+     * - api/auth (NextAuth routes)
      */
-    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|public/|api/auth/).*)",
   ],
 };
