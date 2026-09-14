@@ -342,7 +342,15 @@ export async function execute(
 
   // ── Resolve configuration ──────────────────────────────────────────────
   const hermesCmd = resolveHermesCommand(config);
-  const model = cfgString(config.model) || DEFAULT_MODEL;
+  const explicitModel = cfgString(config.model);
+  // Detect model from Hermes config if not explicitly set in adapter config
+  let detectedModelEarly: string | null = null;
+  if (!explicitModel) {
+    try {
+      detectedModelEarly = (await detectModel())?.model || null;
+    } catch { /* non-fatal */ }
+  }
+  const model = explicitModel || detectedModelEarly || DEFAULT_MODEL;
   const timeoutSec = cfgNumber(config.timeoutSec) || DEFAULT_TIMEOUT_SEC;
   const graceSec = cfgNumber(config.graceSec) || DEFAULT_GRACE_SEC;
   const maxTurns = cfgNumber(config.maxTurnsPerRun);
@@ -440,17 +448,19 @@ export async function execute(
 
   // ── Build command args ─────────────────────────────────────────────────
   // Use -Q (quiet) to get clean output: just response + session_id line
-  const useQuiet = cfgBoolean(config.quiet) === true; // default false
+  const useQuiet = cfgBoolean(config.quiet) !== false; // default true (matches schema default: true)
   const args: string[] = ["chat", "-q", prompt];
   if (useQuiet) args.push("-Q");
 
-  if (model) {
+  // When model is detected from Hermes config, skip -m/--provider flags
+  // — Hermes will read model/provider/base_url from its own config.yaml.
+  // Only pass flags when explicitly set in adapter config or truly auto.
+  if (explicitModel && model && model !== "auto") {
     args.push("-m", model);
   }
 
-  // Always pass --provider when we have a resolved one (not "auto").
-  // "auto" means Hermes will decide on its own — no need to pass it.
-  if (resolvedProvider !== "auto") {
+  // Pass --provider only when explicitly resolved (not auto-detected)
+  if (resolvedProvider !== "auto" && explicitProvider) {
     args.push("--provider", resolvedProvider);
   }
 

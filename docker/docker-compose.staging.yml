@@ -1,0 +1,54 @@
+# Staging Environment for WorkForce365.ai / OnboardAI
+#
+# Usage:
+#   cd docker
+#   export BETTER_AUTH_SECRET="$(openssl rand -hex 32)"
+#   docker compose -f docker-compose.staging.yml up --build -d
+#
+# Environment variables override defaults via .env or shell.
+# Required: BETTER_AUTH_SECRET
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: paperclip
+      POSTGRES_PASSWORD: paperclip
+      POSTGRES_DB: paperclip
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperclip -d paperclip"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    ports:
+      - "5433:5432"  # Non-standard port to avoid conflict with dev
+    volumes:
+      - staging-pgdata:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    pids_limit: 2048
+    ports:
+      - "3101:3100"  # Non-standard port for staging
+    environment:
+      DATABASE_URL: postgres://paperclip:***@db:5432/paperclip
+      PORT: "3100"
+      SERVE_UI: "true"
+      PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
+      PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
+      PAPERCLIP_PUBLIC_URL: "${PAPERCLIP_PUBLIC_URL:-http://localhost:3101}"
+      PAPERCLIP_HOME: "/paperclip"
+      PAPERCLIP_INSTANCE_ID: "staging"
+      PAPERCLIP_MIGRATION_AUTO_APPLY: "true"
+      BETTER_AUTH_SECRET: "${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET must be set}"
+    volumes:
+      - staging-data:/paperclip
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  staging-pgdata:
+  staging-data:

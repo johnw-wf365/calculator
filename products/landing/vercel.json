@@ -1,0 +1,10 @@
+{
+  "framework": "static",
+  "buildCommand": "",
+  "outputDirectory": "products/landing",
+  "installCommand": "",
+  "routes": [
+    { "src": "/webhooks/(.*)", "dest": "https://api.workforce365.ai/webhooks/$1" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

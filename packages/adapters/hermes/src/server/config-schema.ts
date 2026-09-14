@@ -21,6 +21,12 @@ export function getConfigSchema(): AdapterConfigSchema {
   return {
     fields: [
       {
+        key: "model",
+        label: "Model",
+        type: "text",
+        hint: "Override model for this agent (e.g. meituan/longcat-2.0:free). Leave empty to detect from ~/.hermes/config.yaml.",
+      },
+      {
         key: "provider",
         label: "Provider",
         type: "select",

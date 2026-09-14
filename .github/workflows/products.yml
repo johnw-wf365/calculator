@@ -1,0 +1,78 @@
+name: Product Site CI/CD
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'products/**'
+      - '.github/workflows/products.yml'
+  pull_request:
+    paths:
+      - 'products/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate product catalog
+        run: |
+          cd products/products
+          test -f catalog.md || (echo "catalog.md missing" && exit 1)
+          echo "Product catalog exists"
+
+      - name: Check landing page
+        run: |
+          cd products/landing
+          test -f index.html || (echo "index.html missing" && exit 1)
+          echo "Landing page exists"
+
+      - name: Validate webhooks
+        run: |
+          cd products/webhooks
+          test -f delivery.js || (echo "delivery.js missing" && exit 1)
+          node --check delivery.js || exit 1
+          echo "Webhook handler syntax OK"
+
+  deploy-staging:
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel (Staging)
+        uses: vercel/action@v1
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod=false'
+
+  deploy-production:
+    needs: deploy-staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel (Production)
+        uses: vercel/action@v1
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+  notify:
+    needs: deploy-production
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify team
+        run: |
+          echo "Product site deployment completed"
+          # In production, post to Telegram or Slack

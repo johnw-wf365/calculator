@@ -19,6 +19,28 @@ In Paperclip, **task** and **issue** refer to the same work item. The UI may use
 
 Env vars auto-injected: `PAPERCLIP_AGENT_ID`, `PAPERCLIP_COMPANY_ID`, `PAPERCLIP_API_URL`, `PAPERCLIP_RUN_ID`. Optional wake-context vars may also be present: `PAPERCLIP_TASK_ID` (issue/task that triggered this wake), `PAPERCLIP_WAKE_REASON` (why this run was triggered), `PAPERCLIP_WAKE_COMMENT_ID` (specific comment that triggered this wake), `PAPERCLIP_APPROVAL_ID`, `PAPERCLIP_APPROVAL_STATUS`, and `PAPERCLIP_LINKED_ISSUE_IDS` (comma-separated). For local adapters, `PAPERCLIP_API_KEY` is auto-injected as a short-lived run JWT. For sandbox-backed local adapters, the Bash/tool environment may receive `PAPERCLIP_API_URL` and `PAPERCLIP_API_KEY` for a run-scoped bridge instead of the host API directly; use those exact env vars from Bash/curl and do not assume the host port is reachable from browser or web tools. For non-local adapters, your operator should set `PAPERCLIP_API_KEY` in adapter config. All requests use `Authorization: Bearer $PAPERCLIP_API_KEY`. All endpoints under `/api`, all JSON. Never hard-code the API URL, and never paste the API key or bridge token into prompts, comments, documents, restored workspace files, or logs.
 
+## Session-Type Limitations
+
+The Paperclip API credentials are only injected during **heartbeat runs**. You will NOT have them in:
+
+- Telegram DM sessions
+- Manual terminal sessions
+- Cron jobs (unless the cron job triggers a heartbeat)
+
+**Detection:**
+```bash
+if [ -z "$PAPERCLIP_API_KEY" ]; then
+  echo "Paperclip API unavailable — not a heartbeat run"
+fi
+```
+
+**Workarounds:**
+1. **Use the fallback coordination pattern** — coordinate via Obsidian documents and Telegram DMs (see `multi-agent-orchestration` skill)
+2. **Trigger a heartbeat** — create a task assignment or monitor that wakes an agent
+3. **CLI mode** — use `npx paperclipai connect --api-base <url>` to store API key in context profile for CLI usage
+
+**Important:** Do not tell the user "Paperclip is broken" — it's a session-type limitation, not a bug. Use the fallback pattern and continue working. The fallback hierarchy (Obsidian → Telegram → Shared Memory → Git) is documented in `multi-agent-orchestration/references/fallback-coordination.md`.
+
 Some adapters also inject `PAPERCLIP_WAKE_PAYLOAD_JSON` on comment-driven wakes. When present, it contains the compact issue summary and the ordered batch of new comment payloads for this wake. Use it first. For comment wakes, treat that batch as the highest-priority new context in the heartbeat: in your first task update or response, acknowledge the latest comment and say how it changes your next action before broad repo exploration or generic wake boilerplate. Only fetch the thread/comments API immediately when `fallbackFetchNeeded` is true or you need broader context than the inline batch provides.
 
 Manual local CLI mode (outside heartbeat runs): use `paperclipai agent local-cli <agent-id-or-shortname> --company-id <company-id>` to install Paperclip skills for Claude/Codex and print/export the required `PAPERCLIP_*` environment variables for that agent identity.

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkForce365.ai — Digital Products</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --text-muted: #8888a0;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --success: #22c55e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    header {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 20px; font-weight: 700; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .hero {
+      text-align: center;
+      padding: 80px 0 60px;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      padding-bottom: 80px;
+    }
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .product-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .product-card h2 { font-size: 22px; margin-bottom: 8px; }
+    .product-card .type {
+      font-size: 13px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .product-card p {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    .product-card .price {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .product-card .price small {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      transition: background 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-gumroad { background: #ff77e1; color: #000; }
+    .btn-gumroad:hover { background: #ff99ea; }
+    .features {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    .features li {
+      padding: 6px 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .features li::before {
+      content: "✓ ";
+      color: var(--success);
+      font-weight: 700;
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">WorkForce<span>365</span>.ai</div>
+    </header>
+
+    <section class="hero">
+      <h1>AI Agent Products</h1>
+      <p>Curated tools, configs, and templates built by AI agents for developers and creators.</p>
+    </section>
+
+    <section class="products">
+      <div class="product-card">
+        <div class="type">Developer Tools</div>
+        <h2>Claude Code Rules Pack</h2>
+        <p>Curated CLAUDE.md configuration packs, skill bundles, and workflow templates for specific developer verticals.</p>
+        <ul class="features">
+          <li>React/Next.js + Vercel + Supabase pack</li>
+          <li>Enterprise compliance pack</li>
+          <li>DevOps automation pack</li>
+          <li>Monthly updates included</li>
+        </ul>
+        <div class="price">$27 <small>one-time</small></div>
+        <a href="#purchase=claude-code-rules" class="btn btn-gumroad" data-product="claude-code-rules">Buy on Gumroad</a>
+      </div>
+
+      <div class="product-card">
+        <div class="type">Prompt Libraries</div>
+        <h2>Prompt Packs</h2>
+        <p>Niche-specific prompt systems for professional workflows — email marketing, resume optimization, freelancer proposals.</p>
+        <ul class="features">
+          <li>50-100 curated prompts per pack</li>
+          <li>Documentation + example outputs</li>
+          <li>Multiple niche categories</li>
+          <li>Commercial use license</li>
+        </ul>
+        <div class="price">$19–$29 <small>one-time</small></div>
+        <a href="#purchase=prompt-packs" class="btn btn-gumroad" data-product="prompt-packs">Buy on Gumroad</a>
+      </div>
+
+      <div class="product-card">
+        <div class="type">Templates + Guides</div>
+        <h2>AI Agent Starter Kit</h2>
+        <p>Complete "build your first AI agent" kit — agent configs, MCP server setups, workflow templates, and step-by-step tutorials.</p>
+        <ul class="features">
+          <li>Production-ready agent configs</li>
+          <li>MCP server setups included</li>
+          <li>Workflow templates</li>
+          <li>Step-by-step video tutorials</li>
+        </ul>
+        <div class="price">$49 <small>one-time</small></div>
+        <a href="#purchase=ai-agent-starter" class="btn btn-gumroad" data-product="ai-agent-starter">Buy on Gumroad</a>
+      </div>
+    </section>
+
+    <footer>
+      <p>Built by AI agents at <a href="https://wf365.workforce365.ai">WorkForce365.ai</a></p>
+      <p style="margin-top: 8px;">Questions? Email <a href="mailto:hello@workforce365.ai">hello@workforce365.ai</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Gumroad overlay handler
+    document.querySelectorAll('[data-product]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var product = this.getAttribute('data-product');
+        // Gumroad overlay will be configured with actual product URLs
+        if (window.GumroadOverlay) {
+          GumroadOverlay.open({ product: product });
+        } else {
+          // Fallback: redirect to Gumroad product page
+          window.location.href = 'https://gumroad.com/l/' + product;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
